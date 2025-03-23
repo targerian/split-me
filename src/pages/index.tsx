@@ -20,6 +20,10 @@ export default function Home() {
 
   };
 
+  const appendNewCharge = () => {
+    chargesArray.append({ amount: null });
+  };
+
   return (
     <div className="container mt-20">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -46,7 +50,7 @@ export default function Home() {
                 />
                 {index === chargesArray.fields.length - 1 && (
                   <button
-                    onClick={() => chargesArray.append({ amount: null })}
+                    onClick={appendNewCharge}
                     className="text-white p-1 cursor-pointer rounded-md outline outline-slate-50 hover:bg-slate-500 transition-colors"
                   >
                     <Plus />
