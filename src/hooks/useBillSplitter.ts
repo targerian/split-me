@@ -3,24 +3,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { FormValues, formSchema } from "../types/home-types";
 
+export const formDefaultValues: FormValues = {
+  billAmount: null,
+  billWithoutTaxes: null,
+  taxes: [{ amount: null }],
+  charges: [{ amount: null }],
+};
 export const useBillSplitter = () => {
   const [taxPercentage, setTaxPercentage] = useState<number | null>(null);
   const [chargesTotal, setChargesTotal] = useState<number>(0);
 
+
   const formMethods = useForm<FormValues>({
-    defaultValues: {
-      billAmount: null,
-      billWithoutTaxes: null,
-      taxes: [{ amount: null }],
-      charges: [{ amount: null }],
-    },
+    defaultValues: formDefaultValues,
     resolver: zodResolver(formSchema),
     mode: "onChange",
     shouldUnregister: true,
     shouldFocusError: false
   });
 
-  const { control, watch } = formMethods;
+  const { control, watch, reset } = formMethods;
 
   const taxesArray = useFieldArray({
     control,
@@ -92,5 +94,6 @@ export const useBillSplitter = () => {
     chargesArray,
     taxPercentage,
     chargesTotal,
+    reset,
   };
 }; 

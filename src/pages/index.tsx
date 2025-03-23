@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
-import { Plus } from "lucide-react";
+import { Plus, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useBillSplitter } from "@/hooks/useBillSplitter";
+import { formDefaultValues, useBillSplitter } from "@/hooks/useBillSplitter";
 import { BillInput } from "@/screens/home/bill-input";
 import { TaxesInput } from "@/screens/home/tax-input";
 
@@ -12,6 +12,7 @@ export default function Home() {
     chargesArray,
     taxPercentage,
     chargesTotal,
+    reset,
   } = useBillSplitter();
 
   const { handleSubmit, register } = formMethods;
@@ -24,11 +25,18 @@ export default function Home() {
     chargesArray.append({ amount: null });
   };
 
+  const handleReset = () => {
+    reset(formDefaultValues);
+  };
+
   return (
     <div className="container mt-20">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col items-start justify-center h-full w-full">
-          <h1 className="text-lg font-bold mb-4">Bill Description</h1>
+          <div className="flex justify-between items-center w-full mb-4">
+            <h1 className="text-lg font-bold">Bill Description</h1>
+
+          </div>
 
           <div className="flex flex-start justify-between items-start w-full gap-4 mb-4">
             <BillInput formMethods={formMethods} taxPercentage={taxPercentage} />
@@ -61,21 +69,30 @@ export default function Home() {
           </div>
 
           <Separator className="w-full bg-slate-200 mb-2" />
-
-          <h2 className="text-lg font-bold mb-2">Total amount of charges</h2>
+          <div className="flex justify-between items-center w-full">
+            <h2 className="text-lg font-bold mb-2">Total amount of charges</h2>
+            <button
+              type="button"
+              onClick={handleReset}
+              className=" text-sm text-slate-200 hover-text-slate-100 cursor-pointer transition-colors"
+            >
+              <RotateCcw />
+            </button>
+          </div>
           <span className="text-base text-slate-200">
             {chargesTotal > 0 && (
               <>
                 You have to pay: {chargesTotal.toFixed(2)}
                 {taxPercentage !== null && (
                   <span className="text-sm text-slate-500">
-                    {" "}(including {Number.isInteger(taxPercentage) ? taxPercentage : taxPercentage.toFixed(2)}% tax)
+                    (including {Number.isInteger(taxPercentage) ? taxPercentage : taxPercentage.toFixed(2)}% tax)
                   </span>
                 )}
               </>
             )}
           </span>
         </div>
+
       </form>
     </div>
   );
