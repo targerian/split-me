@@ -61,7 +61,8 @@ export default function Home() {
     },
     resolver: zodResolver(formSchema),
     mode: "onChange",
-    shouldUnregister: true
+    shouldUnregister: true,
+    shouldFocusError: false
   });
 
   const { fields, append } = useFieldArray({
