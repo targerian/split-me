@@ -2,21 +2,44 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type FormValues = {
-  billAmount: number | null;
-  billWithoutTaxes: number | null;
-  taxes: { amount: number | null }[];
-  charges: { amount: number | null }[];
-};
+const formSchema = z.object({
+  billAmount: z.number({
+    required_error: "Bill amount is required",
+    invalid_type_error: "Bill amount must be a number",
+  }).nullable(),
+  billWithoutTaxes: z.number({
+    invalid_type_error: "Bill without taxes must be a number",
+  }).nullable(),
+  taxes: z.array(
+    z.object({
+      amount: z.number({
+        invalid_type_error: "Tax amount must be a number",
+      }).nullable(),
+    })
+  ),
+  charges: z.array(
+    z.object({
+      amount: z.number({
+        invalid_type_error: "Charge amount must be a number",
+      }).nullable(),
+    })
+  ),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function Home() {
   const { register, control, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       billAmount: null,
+      billWithoutTaxes: null,
       taxes: [{ amount: null }],
       charges: [{ amount: null }],
     },
+    resolver: zodResolver(formSchema),
     reValidateMode: "onChange",
   });
 
@@ -66,9 +89,9 @@ export default function Home() {
       </div>
       <Separator className="w-full bg-slate-200 mb-2" />
       <h2 className="text-lg font-bold mb-2">Your charges</h2>
-      <div className="flex flex-col items-start justify-start gap-2 mb-4">
+      <div className="flex flex-col items-start justify-start gap-2 mb-4 w-full">
         {chargesFields.map((field, index) => (
-          <div key={field.id} className="flex justify-end items-center gap-2">
+          <div key={field.id} className="flex justify-end items-center gap-2 w-75">
             <Input placeholder={`Charge ${index + 1}`} type="number" {...register(`charges.${index}.amount`, { valueAsNumber: true })} />
             {index === chargesFields.length - 1 && (
               <button onClick={() => appendCharges({ amount: null })} className=" text-white p-1 cursor-pointer rounded-md outline  outline-slate-50 hover:bg-slate-500 transition-colors">
