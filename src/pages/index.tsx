@@ -78,7 +78,7 @@ export default function Home() {
 
   // First useEffect for tax percentage calculation
   useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
+    const subscription = watch((value) => {
       const formValues = value as FormValues;
       const { billAmount, billWithoutTaxes, taxes } = formValues;
 
@@ -110,11 +110,10 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  console.log('errors', errors)
 
   // New useEffect for total charges calculation
   useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
+    const subscription = watch((value) => {
       const formValues = value as FormValues;
       const { charges } = formValues;
 
@@ -134,9 +133,10 @@ export default function Home() {
   }, [watch, taxPercentage]);
 
   // Add this function to see form data and errors
-  const onSubmit = (data: FormValues) => {
-    console.log('Form data:', data);
+  const onSubmit = () => {
+    // console.log('Form data:', data);
   };
+
 
   return <div className="container mt-6">
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -157,7 +157,13 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center justify-center gap-2">
-            <Input placeholder="Bill without taxes" type="number" {...register("billWithoutTaxes", { valueAsNumber: true })} />
+            <Input placeholder="Bill without taxes" type="number" {...register("billWithoutTaxes", {
+              setValueAs: (value) => {
+                if (value === "") return null;
+                const num = Number(value);
+                return isNaN(num) ? null : num;
+              }
+            })} />
             {errors.billWithoutTaxes && (
               <span className="text-red-400 text-xs">{errors.billWithoutTaxes.message}</span>
             )}
@@ -174,7 +180,7 @@ export default function Home() {
                   type="number"
                   {...register(`taxes.${index}.amount`, {
                     valueAsNumber: true,
-                    onChange: (e) => {
+                    onChange: () => {
                       // Trigger validation immediately when tax input changes
                       handleSubmit(() => { })();
                     }
