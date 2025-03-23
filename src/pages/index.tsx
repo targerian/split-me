@@ -61,6 +61,7 @@ export default function Home() {
     },
     resolver: zodResolver(formSchema),
     mode: "onChange",
+    shouldUnregister: true
   });
 
   const { fields, append } = useFieldArray({
@@ -158,7 +159,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center gap-2">
             <Input placeholder="Bill without taxes" type="number" {...register("billWithoutTaxes", { valueAsNumber: true })} />
             {errors.billWithoutTaxes && (
-              <span className="text-red-500 text-xs">{errors.billWithoutTaxes.message}</span>
+              <span className="text-red-400 text-xs">{errors.billWithoutTaxes.message}</span>
             )}
             <div className="relative w-full my-2">
               <Separator className="w-full bg-slate-200" />
