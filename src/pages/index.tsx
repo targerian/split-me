@@ -33,7 +33,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Home() {
-  const { register, control, formState: { errors } } = useForm<FormValues>({
+  const { register, control, watch, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       billAmount: null,
       billWithoutTaxes: null,
@@ -55,9 +55,12 @@ export default function Home() {
 
   const [taxPercentage, setTaxPercentage] = useState<number | null>(null);
 
-  useEffect(() => {
-    const { billAmount, billWithoutTaxes, taxes } = control._formValues;
+  // Watch the relevant fields
+  const billAmount = watch('billAmount');
+  const billWithoutTaxes = watch('billWithoutTaxes');
+  const taxes = watch('taxes');
 
+  useEffect(() => {
     // If billAmount is not provided, we can't calculate
     if (!billAmount) {
       setTaxPercentage(null);
@@ -81,10 +84,9 @@ export default function Home() {
     }
 
     setTaxPercentage(null);
-  }, [control._formValues]);
+  }, [billAmount, billWithoutTaxes, taxes]);
 
-  console.log(taxPercentage);
-  console.log(control._formValues);
+
 
   return <div className="container ">
     <div className="flex flex-col items-start justify-center h-full w-full">
