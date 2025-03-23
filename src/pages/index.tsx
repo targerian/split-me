@@ -144,7 +144,13 @@ export default function Home() {
         <h1 className="text-lg font-bold mb-4">Bill Description</h1>
         <div className="flex flex-start justify-between items-start w-full gap-4 mb-4">
           <div className="flex flex-col justify-start item-start gap-2 w-full">
-            <Input placeholder="Whole Bill amount" type="number" {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })} />
+            <Input
+              placeholder="Whole Bill amount"
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })}
+            />
             {errors.billAmount && (
               <span className="text-red-500 text-sm">{errors.billAmount.message}</span>
             )}
@@ -157,13 +163,19 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center justify-center gap-2">
-            <Input placeholder="Bill without taxes" type="number" {...register("billWithoutTaxes", {
-              setValueAs: (value) => {
-                if (value === "") return null;
-                const num = Number(value);
-                return isNaN(num) ? null : num;
-              }
-            })} />
+            <Input
+              placeholder="Bill without taxes"
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              {...register("billWithoutTaxes", {
+                setValueAs: (value) => {
+                  if (value === "") return null;
+                  const num = Number(value);
+                  return isNaN(num) ? null : num;
+                }
+              })}
+            />
             {errors.billWithoutTaxes && (
               <span className="text-red-400 text-xs">{errors.billWithoutTaxes.message}</span>
             )}
@@ -178,6 +190,8 @@ export default function Home() {
                 <Input
                   placeholder={`Tax ${index + 1}`}
                   type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   {...register(`taxes.${index}.amount`, {
                     valueAsNumber: true,
                     onChange: () => {
@@ -200,7 +214,13 @@ export default function Home() {
         <div className="flex flex-col items-start justify-start gap-2 mb-4 w-full">
           {chargesFields.map((field, index) => (
             <div key={field.id} className="flex justify-end items-center gap-2 w-75">
-              <Input placeholder={`Charge ${index + 1}`} type="number" {...register(`charges.${index}.amount`, { valueAsNumber: true })} />
+              <Input
+                placeholder={`Charge ${index + 1}`}
+                type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                {...register(`charges.${index}.amount`, { valueAsNumber: true })}
+              />
               {index === chargesFields.length - 1 && (
                 <button onClick={() => appendCharges({ amount: null })} className=" text-white p-1 cursor-pointer rounded-md outline  outline-slate-50 hover:bg-slate-500 transition-colors">
                   <Plus />
