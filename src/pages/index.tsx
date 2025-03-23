@@ -1,113 +1,88 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Plus } from "lucide-react";
+import { useFieldArray, useForm } from "react-hook-form";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+type FormValues = {
+  billAmount: number | null;
+  billWithoutTaxes: number | null;
+  taxes: { amount: number | null }[];
+  charges: { amount: number | null }[];
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const { register, control, formState: { errors } } = useForm<FormValues>({
+    defaultValues: {
+      billAmount: null,
+      taxes: [{ amount: null }],
+      charges: [{ amount: null }],
+    },
+    reValidateMode: "onChange",
+  });
+
+  const { fields, append } = useFieldArray({
+    control,
+    name: "taxes",
+  });
+  const { fields: chargesFields, append: appendCharges } = useFieldArray({
+    control,
+    name: "charges",
+  });
+
+
+
+  return <div className="container ">
+    <div className="flex flex-col items-start justify-center h-full w-full">
+      <h1 className="text-lg font-bold">Bill Description</h1>
+      <div className="flex flex-start justify-between items-start w-full gap-4 mb-2">
+        <div className="flex flex-col justify-start item-start gap-2 w-full">
+          <Input placeholder="Bill amount" type="number" {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })} />
+          {errors.billAmount && (
+            <span className="text-red-500 text-sm">{errors.billAmount.message}</span>
+          )}
+          <span>bill info</span>
+
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Input placeholder="Bill  without taxes" type="number" {...register("billWithoutTaxes", { valueAsNumber: true })} />
+          <div className="relative w-full my-2">
+            <Separator className="w-full bg-slate-200" />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-sm text-slate-500">
+              Or
+            </span>
+          </div>
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex justify-end items-center gap-2">
+              <Input placeholder={`Tax ${index + 1}`} type="number" {...register(`taxes.${index}.amount`, { valueAsNumber: true })} />
+              {index === fields.length - 1 && (
+                <button onClick={() => append({ amount: null })} className=" text-white p-1 cursor-pointer rounded-md outline  outline-slate-50 hover:bg-slate-500 transition-colors">
+                  <Plus />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <Separator className="w-full bg-slate-200 mb-2" />
+      <h2 className="text-lg font-bold mb-2">Your charges</h2>
+      <div className="flex flex-col items-start justify-start gap-2 mb-4">
+        {chargesFields.map((field, index) => (
+          <div key={field.id} className="flex justify-end items-center gap-2">
+            <Input placeholder={`Charge ${index + 1}`} type="number" {...register(`charges.${index}.amount`, { valueAsNumber: true })} />
+            {index === chargesFields.length - 1 && (
+              <button onClick={() => appendCharges({ amount: null })} className=" text-white p-1 cursor-pointer rounded-md outline  outline-slate-50 hover:bg-slate-500 transition-colors">
+                <Plus />
+              </button>
+            )}
+          </div>
+        ))}
+
+      </div>
+      <Separator className="w-full bg-slate-200 mb-2" />
+      <h2 className="text-lg font-bold mb-2">Total Amount of charges</h2>
+
     </div>
-  );
+
+  </div>
 }
