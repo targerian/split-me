@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
 
 const formSchema = z.object({
   billAmount: z.number({
@@ -52,19 +53,54 @@ export default function Home() {
     name: "charges",
   });
 
+  const [taxPercentage, setTaxPercentage] = useState<number | null>(null);
 
+  useEffect(() => {
+    const { billAmount, billWithoutTaxes, taxes } = control._formValues;
+
+    // If billAmount is not provided, we can't calculate
+    if (!billAmount) {
+      setTaxPercentage(null);
+      return;
+    }
+
+    // Method 1: Using billWithoutTaxes
+    if (billWithoutTaxes) {
+      const percentage = ((billAmount - billWithoutTaxes) / billWithoutTaxes) * 100;
+      setTaxPercentage(percentage);
+      return;
+    }
+
+    // Method 2: Using taxes array
+    const taxesSum = taxes.reduce((sum, tax) => sum + (tax.amount || 0), 0);
+    if (taxesSum > 0) {
+      const calculatedBillWithoutTaxes = billAmount - taxesSum;
+      const percentage = (taxesSum / calculatedBillWithoutTaxes) * 100;
+      setTaxPercentage(percentage);
+      return;
+    }
+
+    setTaxPercentage(null);
+  }, [control._formValues]);
+
+  console.log(taxPercentage);
+  console.log(control._formValues);
 
   return <div className="container ">
     <div className="flex flex-col items-start justify-center h-full w-full">
       <h1 className="text-lg font-bold">Bill Description</h1>
       <div className="flex flex-start justify-between items-start w-full gap-4 mb-2">
         <div className="flex flex-col justify-start item-start gap-2 w-full">
-          <Input placeholder="Bill amount" type="number" {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })} />
+          <Input placeholder="Whole Bill amount" type="number" {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })} />
           {errors.billAmount && (
             <span className="text-red-500 text-sm">{errors.billAmount.message}</span>
           )}
-          <span>bill info</span>
-
+          <span>Bill Info</span>
+          {taxPercentage !== null && (
+            <span className="text-sm text-slate-600">
+              Tax Percentage: {taxPercentage.toFixed(2)}%
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col items-center justify-center gap-2">
