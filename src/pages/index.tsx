@@ -55,38 +55,38 @@ export default function Home() {
 
   const [taxPercentage, setTaxPercentage] = useState<number | null>(null);
 
-  // Watch the relevant fields
-  const billAmount = watch('billAmount');
-  const billWithoutTaxes = watch('billWithoutTaxes');
-  const taxes = watch('taxes');
-
   useEffect(() => {
-    // If billAmount is not provided, we can't calculate
-    if (!billAmount) {
+    const subscription = watch((value, { name, type }) => {
+      const formValues = value as FormValues;
+      const { billAmount, billWithoutTaxes, taxes } = formValues;
+
+      // If billAmount is not provided, we can't calculate
+      if (!billAmount) {
+        setTaxPercentage(null);
+        return;
+      }
+
+      // Method 1: Using billWithoutTaxes
+      if (billWithoutTaxes) {
+        const percentage = ((billAmount - billWithoutTaxes) / billWithoutTaxes) * 100;
+        setTaxPercentage(percentage);
+        return;
+      }
+
+      // Method 2: Using taxes array
+      const taxesSum = taxes.reduce((sum, tax) => sum + (tax.amount || 0), 0);
+      if (taxesSum > 0) {
+        const calculatedBillWithoutTaxes = billAmount - taxesSum;
+        const percentage = (taxesSum / calculatedBillWithoutTaxes) * 100;
+        setTaxPercentage(percentage);
+        return;
+      }
+
       setTaxPercentage(null);
-      return;
-    }
+    });
 
-    // Method 1: Using billWithoutTaxes
-    if (billWithoutTaxes) {
-      const percentage = ((billAmount - billWithoutTaxes) / billWithoutTaxes) * 100;
-      setTaxPercentage(percentage);
-      return;
-    }
-
-    // Method 2: Using taxes array
-    const taxesSum = taxes.reduce((sum, tax) => sum + (tax.amount || 0), 0);
-    if (taxesSum > 0) {
-      const calculatedBillWithoutTaxes = billAmount - taxesSum;
-      const percentage = (taxesSum / calculatedBillWithoutTaxes) * 100;
-      setTaxPercentage(percentage);
-      return;
-    }
-
-    setTaxPercentage(null);
-  }, [billAmount, billWithoutTaxes, taxes]);
-
-
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   return <div className="container ">
     <div className="flex flex-col items-start justify-center h-full w-full">
