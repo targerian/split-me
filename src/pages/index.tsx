@@ -54,7 +54,9 @@ export default function Home() {
   });
 
   const [taxPercentage, setTaxPercentage] = useState<number | null>(null);
+  const [chargesTotal, setChargesTotal] = useState<number>(0);
 
+  // First useEffect for tax percentage calculation
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       const formValues = value as FormValues;
@@ -88,10 +90,32 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
+  // New useEffect for total charges calculation
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      const formValues = value as FormValues;
+      const { charges } = formValues;
+
+      // Sum all charges
+      const chargesSum = charges.reduce((sum, charge) => sum + (charge.amount || 0), 0);
+
+      // If we have a tax percentage, add it to the total
+      if (taxPercentage !== null && chargesSum > 0) {
+        const taxAmount = (chargesSum * taxPercentage) / 100;
+        setChargesTotal(chargesSum + taxAmount);
+      } else {
+        setChargesTotal(chargesSum);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch, taxPercentage]);
+
+
   return <div className="container ">
     <div className="flex flex-col items-start justify-center h-full w-full">
-      <h1 className="text-lg font-bold">Bill Description</h1>
-      <div className="flex flex-start justify-between items-start w-full gap-4 mb-2">
+      <h1 className="text-lg font-bold mb-4">Bill Description</h1>
+      <div className="flex flex-start justify-between items-start w-full gap-4 mb-4">
         <div className="flex flex-col justify-start item-start gap-2 w-full">
           <Input placeholder="Whole Bill amount" type="number" {...register("billAmount", { valueAsNumber: true, required: "Bill amount is required" })} />
           {errors.billAmount && (
@@ -99,8 +123,8 @@ export default function Home() {
           )}
           <span>Bill Info</span>
           {taxPercentage !== null && (
-            <span className="text-sm text-slate-600">
-              Tax Percentage: {taxPercentage.toFixed(2)}%
+            <span className="text-sm text-slate-500">
+              Tax Percentage: {Number.isInteger(taxPercentage) ? taxPercentage : taxPercentage.toFixed(2)}%
             </span>
           )}
         </div>
@@ -126,7 +150,7 @@ export default function Home() {
         </div>
       </div>
       <Separator className="w-full bg-slate-200 mb-2" />
-      <h2 className="text-lg font-bold mb-2">Your charges</h2>
+      <h2 className="text-lg font-bold mb-4">Your Charges</h2>
       <div className="flex flex-col items-start justify-start gap-2 mb-4 w-full">
         {chargesFields.map((field, index) => (
           <div key={field.id} className="flex justify-end items-center gap-2 w-75">
@@ -141,7 +165,17 @@ export default function Home() {
 
       </div>
       <Separator className="w-full bg-slate-200 mb-2" />
-      <h2 className="text-lg font-bold mb-2">Total Amount of charges</h2>
+      <h2 className="text-lg font-bold mb-2">Total amount of charges</h2>
+      <span className="text-base text-slate-200">
+        {chargesTotal > 0 && (
+          <>
+            You have to pay: {chargesTotal.toFixed(2)}
+            {taxPercentage !== null && (
+              <span className="text-sm text-slate-500"> (including {Number.isInteger(taxPercentage) ? taxPercentage : taxPercentage.toFixed(2)}% tax)</span>
+            )}
+          </>
+        )}
+      </span>
 
     </div>
 
