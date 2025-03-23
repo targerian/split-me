@@ -138,7 +138,7 @@ export default function Home() {
     console.log('Form data:', data);
   };
 
-  return <div className="container ">
+  return <div className="container mt-6">
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col items-start justify-center h-full w-full">
         <h1 className="text-lg font-bold mb-4">Bill Description</h1>
@@ -169,7 +169,17 @@ export default function Home() {
             </div>
             {fields.map((field, index) => (
               <div key={field.id} className="flex justify-end items-center gap-2">
-                <Input placeholder={`Tax ${index + 1}`} type="number" {...register(`taxes.${index}.amount`, { valueAsNumber: true })} />
+                <Input
+                  placeholder={`Tax ${index + 1}`}
+                  type="number"
+                  {...register(`taxes.${index}.amount`, {
+                    valueAsNumber: true,
+                    onChange: (e) => {
+                      // Trigger validation immediately when tax input changes
+                      handleSubmit(() => { })();
+                    }
+                  })}
+                />
                 {index === fields.length - 1 && (
                   <button onClick={() => append({ amount: null })} className=" text-white p-1 cursor-pointer rounded-md outline  outline-slate-50 hover:bg-slate-500 transition-colors">
                     <Plus />
