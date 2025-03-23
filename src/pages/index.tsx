@@ -139,7 +139,7 @@ export default function Home() {
   };
 
 
-  return <div className="container mt-6">
+  return <div className="container mt-20">
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col items-start justify-center h-full w-full">
         <h1 className="text-lg font-bold mb-4">Bill Description</h1>
