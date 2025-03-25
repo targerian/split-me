@@ -1,5 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
-
+Split me is a simple little progressive web app (pwa) that splits the bill between you and your friends, it has the ability to calculate the tax percentage and tell you how much exactly you should pay
 ## Getting Started
 
 First, run the development server:
